@@ -16,7 +16,12 @@ var langs = [
 ]
 
 function translateNode(node) {
-    translate(node.textContent, {from:defaultLang, to:translateLang, engine: "yandex", key:"trnsl.1.1.20200210T173804Z.9d1bb553371da5f4.47d506e56eaa9e6baafe79e422fa764bd13781df"}).then(
+    translate(node.textContent, {
+        from:defaultLang, 
+        to:translateLang, 
+        engine: "google",//"yandex", 
+        key:"AIzaSyAPiiIMRgPzpEtCkSV8My9gB-LXYEctve0" //"trnsl.1.1.20200210T173804Z.9d1bb553371da5f4.47d506e56eaa9e6baafe79e422fa764bd13781df"
+        }).then(
         (res) => {
           node.textContent = res
         }
