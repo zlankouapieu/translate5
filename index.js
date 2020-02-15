@@ -15,10 +15,10 @@ var langs = [
     }
 ]
 
-function translateNode(node) {
+function translateNode(node, from, to) {
     translate(node.textContent, {
-        from:defaultLang, 
-        to:translateLang, 
+        from, 
+        to, 
         engine: "google",//"yandex", 
         key:"AIzaSyAPiiIMRgPzpEtCkSV8My9gB-LXYEctve0" //"trnsl.1.1.20200210T173804Z.9d1bb553371da5f4.47d506e56eaa9e6baafe79e422fa764bd13781df"
         }).then(
@@ -28,17 +28,17 @@ function translateNode(node) {
     )
 }
 
-function getChilds(node) {
+function getChilds(node, from, to) {
     
     
     if ((node.childNodes.length === 1 && node.childNodes[0].nodeName === "#text") || node.nodeName === "#text" ) {
-        translateNode(node)
+        translateNode(node, from, to)
     }else{
         for (const nodeItem of node.childNodes) {
             if (nodeItem.hasChildNodes) {
                 nodeItem.childNodes.forEach(
                     (res) => {
-                        getChilds(res)
+                        getChilds(res, from, to)
                     }
                 )
             }     
@@ -55,16 +55,46 @@ document.body.appendChild(appDiv)
 
 var app = new Vue({
     el: appDiv,
+    created(){
+        translateLang = localStorage.getItem("lang")
+        
+        if (!translateLang) {
+           translateLang =  navigator.language 
+           if (translateLang.includes(defaultLang) !== -1) {
+               this.currentLang = defaultLang
+               
+           }else{
+               //this.currentLang = 
+               langs.forEach((val) => {
+                    if (translateLang.includes(val.value) !== -1) {
+                        this.currentLang = val.value
+                    }
+                })
+           }
+        }else{
+            this.currentLang = translateLang
+        }
+    },
+    destroyed(){
+        
+    },
     data:{
         options: langs,
-        currentLang: translateLang
+        currentLang: ""
     },
     watch:{
         currentLang(newVal, oldVal){
             /** traduction en cas de moification de la langue */
-            defaultLang = oldVal
+            if (oldVal) {
+                defaultLang = oldVal    
+            }
+            
             translateLang = newVal   
-            main()
+            localStorage.setItem("lang", newVal)
+            
+            if (newVal !== defaultLang) {
+                main(defaultLang, translateLang)    
+            }
         }
     },
     template:`
@@ -84,11 +114,11 @@ var app = new Vue({
 })
 
 
-function main(){
+function main(from, to){
     var event = new Event("start-translate")
     document.dispatchEvent(event)
     for (const item of document.childNodes) {
-        getChilds(document)      
+        getChilds(document, from, to)      
     }
     var event = new Event("end-translate")
     document.dispatchEvent(event)
