@@ -16,22 +16,26 @@ var langs = [
 ]
 
 function translateNode(node, from, to) {
-    translate(node.textContent, {
-        from, 
-        to, 
-        engine: "google",//"yandex", 
-        key:"AIzaSyAPiiIMRgPzpEtCkSV8My9gB-LXYEctve0" //"trnsl.1.1.20200210T173804Z.9d1bb553371da5f4.47d506e56eaa9e6baafe79e422fa764bd13781df"
-        }).then(
-        (res) => {
-          node.textContent = res
-        }
-    )
+    if (node.innerText) {
+        translate(node.innerText, {
+            from, 
+            to, 
+            engine: "google",//"yandex", 
+            key:"AIzaSyAPiiIMRgPzpEtCkSV8My9gB-LXYEctve0" //"trnsl.1.1.20200210T173804Z.9d1bb553371da5f4.47d506e56eaa9e6baafe79e422fa764bd13781df"
+            }).then(
+            (res) => {
+            node.textContent = res
+            }
+        )
+    }
 }
 
 function getChilds(node, from, to) {
     
     
     if ((node.childNodes.length === 1 && node.childNodes[0].nodeName === "#text") || node.nodeName === "#text" ) {
+        console.log("node translate :", node.innerText);
+        
         translateNode(node, from, to)
     }else{
         for (const nodeItem of node.childNodes) {
@@ -78,8 +82,6 @@ function onLoad(params) {
     var app = new Vue({
         el: appDiv,
         created(){
-            console.log("vuejs loaded!");
-            
             translateLang = localStorage.getItem("lang")
             
             if (!translateLang) {
