@@ -53,65 +53,6 @@ appDiv.id = "translate-app"
 appDiv.textContent = "App vue"
 document.body.appendChild(appDiv)
 
-var app = new Vue({
-    el: appDiv,
-    created(){
-        translateLang = localStorage.getItem("lang")
-        
-        if (!translateLang) {
-           translateLang =  navigator.language 
-           if (translateLang.includes(defaultLang) !== -1) {
-               this.currentLang = defaultLang
-               
-           }else{
-               //this.currentLang = 
-               langs.forEach((val) => {
-                    if (translateLang.includes(val.value) !== -1) {
-                        this.currentLang = val.value
-                    }
-                })
-           }
-        }else{
-            this.currentLang = translateLang
-        }
-    },
-    destroyed(){
-        
-    },
-    data:{
-        options: langs,
-        currentLang: ""
-    },
-    watch:{
-        currentLang(newVal, oldVal){
-            /** traduction en cas de moification de la langue */
-            if (oldVal) {
-                defaultLang = oldVal    
-            }
-            
-            translateLang = newVal   
-            localStorage.setItem("lang", newVal)
-            
-            if (newVal !== defaultLang) {
-                main(defaultLang, translateLang)    
-            }
-        }
-    },
-    template:`
-        <div class="bg-gray" >
-            <select v-model="currentLang"   >
-                <option desabled value="">Choisir votre langue</option>
-                <option 
-                v-for="(lang,index) in options"
-                :key="''.concat(index)"
-                :value="lang.value"
-                >
-                    {{lang.label}}
-                </option>
-            </select>
-        </div>
-    `
-})
 
 
 function main(from, to){
@@ -132,4 +73,68 @@ document.addEventListener('end-translate', function (evt) {
     console.log("fin de la trauction");
 })
 
-main()
+
+function onLoad(params) {
+    var app = new Vue({
+        el: appDiv,
+        created(){
+            console.log("vuejs loaded!");
+            
+            translateLang = localStorage.getItem("lang")
+            
+            if (!translateLang) {
+               translateLang =  navigator.language 
+               if (translateLang.includes(defaultLang) !== -1) {
+                   this.currentLang = defaultLang
+                   
+               }else{
+                   //this.currentLang = 
+                   langs.forEach((val) => {
+                        if (translateLang.includes(val.value) !== -1) {
+                            this.currentLang = val.value
+                        }
+                    })
+               }
+            }else{
+                this.currentLang = translateLang
+            }
+        },
+        destroyed(){
+            
+        },
+        data:{
+            options: langs,
+            currentLang: ""
+        },
+        watch:{
+            currentLang(newVal, oldVal){
+                /** traduction en cas de moification de la langue */
+                if (oldVal) {
+                    defaultLang = oldVal    
+                }
+                
+                translateLang = newVal   
+                localStorage.setItem("lang", newVal)
+                
+                if (newVal !== defaultLang) {
+                    main(defaultLang, translateLang)    
+                }
+            }
+        },
+        template:`
+            <div class="bg-gray" >
+                <select v-model="currentLang"   >
+                    <option desabled value="">Choisir votre langue</option>
+                    <option 
+                    v-for="(lang,index) in options"
+                    :key="''.concat(index)"
+                    :value="lang.value"
+                    >
+                        {{lang.label}}
+                    </option>
+                </select>
+            </div>
+        `
+    })
+    
+}
